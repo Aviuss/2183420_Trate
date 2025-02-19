@@ -7,6 +7,7 @@ services:
       - "8081:8081"
     volumes:
       - ./containers/reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: always
     depends_on:
       - app
       - auth
@@ -24,6 +25,7 @@ services:
       interval: 20s
       timeout: 45s
       retries: 2
+    restart: always
     environment:
       - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
   
@@ -38,6 +40,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 5
+    restart: always
     environment:
       - POSTGRES_USER=${POSTGRESDB_USER}
       - POSTGRES_PASSWORD=${POSTGRESDB_PASSWORD}
@@ -48,6 +51,7 @@ services:
     container_name: app
     ports:
       - "5000:5000"
+    restart: always
 
   open-ai-translation:
     build: ./containers/open-ai-translation
@@ -56,22 +60,30 @@ services:
       - "5001:5001"
     environment:
       - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
+      - AMQP_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
+    restart: always
     depends_on:
       - rabbitmq
+  
 
   process-translation:
     build: ./containers/process-translation
     container_name: process-translation
     ports:
       - "5002:5002"
+    restart: always
     environment:
-      AMQP_URL: amqp://rabbitmq:5672
+      AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      DATABASE_URL: postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
     depends_on:
       - rabbitmq
+      - open-ai-translation
 
   rabbitmq:
     image: rabbitmq:4-management-alpine
     container_name: rabbitmq
+    restart: always
     ports:
       - 5672:5672
       - 15672:15672
@@ -79,8 +91,8 @@ services:
       - rabbitmq-data-volume:/var/lib/rabbitmq/
       - rabbitmq-log-volume:/var/log/rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=password
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
