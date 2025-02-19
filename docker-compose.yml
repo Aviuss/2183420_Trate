@@ -56,17 +56,15 @@ services:
   open-ai-translation:
     build: ./containers/open-ai-translation
     container_name: open-ai-translation
-    ports:
-      - "5001:5001"
     environment:
       - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
       - AMQP_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
       - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
     restart: always
     depends_on:
-      - rabbitmq
-  
-
+      rabbitmq:
+        condition: service_healthy
+      
   process-translation:
     build: ./containers/process-translation
     container_name: process-translation
@@ -77,11 +75,11 @@ services:
       AMQP_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
       DATABASE_URL: postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
     depends_on:
-      - rabbitmq
-      - open-ai-translation
+      rabbitmq:
+        condition: service_healthy
 
   rabbitmq:
-    image: rabbitmq:4-management-alpine
+    build: ./containers/rabbitmq
     container_name: rabbitmq
     restart: always
     ports:
@@ -94,11 +92,34 @@ services:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 3
+      test: "curl -f http://localhost:15672"
+      interval: 10s
+      timeout: 10s
+      retries: 3     
+  
+  llama-translation:
+    build: ./containers/llama-translation
+    container_name: llama-translation
+    environment:
+      - AMQP_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
+      - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
+    restart: always
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      ollama:
+        condition: service_started
 
+  ollama:
+    image: ollama/ollama:latest
+    pull_policy: always
+    container_name: ollama
+    ports:
+    - 11434:11434
+    restart: always
+    volumes:
+      - ollama-volume:/root/.ollama
 
 
 volumes:
@@ -110,3 +131,5 @@ volumes:
     name: rabbitmq-log-volume
   autoheal-volume:
     name: autoheal-volume
+  ollama-volume:
+    name: ollama-volume

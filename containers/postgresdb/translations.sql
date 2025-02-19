@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS translations (
-    id TEXT PRIMARY KEY,
+    np SERIAL PRIMARY KEY,
+    id TEXT NOT NULL,
     submituid TEXT NOT NULL,
     original_text TEXT NOT NULL,
     original_lang TEXT NOT NULL,

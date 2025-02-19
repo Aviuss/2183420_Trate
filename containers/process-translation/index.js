@@ -52,6 +52,7 @@ app.post('/', async (req, res) => {
     const channel = await connection.createConfirmChannel()
     await channel.assertExchange("process-translation", 'fanout', { durable: true });
 
+    req.body.id = id;
     channel.publish("process-translation", ' ', Buffer.from(JSON.stringify(req.body)), { persistent: true });
     await channel.waitForConfirms();
     await channel.close();
