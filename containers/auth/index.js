@@ -7,27 +7,13 @@ const { sha256 } = require('js-sha256');
 app.use(express.json());
 
 const pool = new pg.Pool({
-    host: process.env.AUTH_POSTGRESDB_HOST,
-    port: process.env.AUTH_POSTGRESDB_PORT,
+    host: process.env.AUTH_POSTGRESDB_DB,
+    port: 5432,
     user: process.env.AUTH_POSTGRESDB_USER,
     password: process.env.AUTH_POSTGRESDB_PASSWORD,
     database: process.env.AUTH_POSTGRESDB_DB,
 });
 
-
-app.get('/', async (req, res) => {
-    const client = await pool.connect();
-    try {
-        const response = await client.query("SELECT * FROM subscriber")
-        const { rows } = response;
-        res.json({ "out": rows });
-    } catch (err) {
-        console.log(err);
-        res.json("error");
-    } finally {
-        client.release();
-    }
-});
 
 app.get('/sth', async (req, res) => {
     res.json("sth");
@@ -184,6 +170,6 @@ app.post("/uid/valid", async (req, res) => {
 
 
 
-app.listen(1000, () => {
+app.listen(3000, () => {
     console.log('Server is running');
 });

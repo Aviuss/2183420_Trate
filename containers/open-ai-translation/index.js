@@ -1,30 +1,31 @@
 import OpenAI from "openai";
+
 const openai = new OpenAI({
-    apiKey: "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"
+    apiKey: process.env.OPEN_AI_API_KEY
 });
 
-console.log(await translate("What are you doing"))
 
 async function translate(phrase, original_language, target_language) {
     const completion = await openai.chat.completions.create({
-        model: "gpt-4o-2024-08-06",
+        model: "gpt-4o",
         messages: [
-            { role: "developer", content: "You extract email addresses into JSON data." },
+            { role: "developer", content: "You translate sentences into JSON data." },
             {
                 role: "user",
-                content: "Feeling stuck? Send a message to help@mycompany.com.",
+                content: `Translate sentences from ${original_language} to ${target_language}:
+                
+                ${phrase}`,
             },
         ],
         response_format: {
-            // See /docs/guides/structured-outputs
             type: "json_schema",
             json_schema: {
-                name: "email_schema",
+                name: "translation_schema",
                 schema: {
                     type: "object",
                     properties: {
-                        email: {
-                            description: "The email address that appears in the input",
+                        translation: {
+                            description: "The translation of the sentences provided in input",
                             type: "string"
                         }
                     },
@@ -35,6 +36,17 @@ async function translate(phrase, original_language, target_language) {
         store: true,
     });
 
-    console.log(completion.choices[0].message.content);
-    console.log(completion)
+    return completion.choices[0].message.content;
 }
+
+import express from 'express';
+const app = express();
+
+
+app.get('/', async (req, res) => {
+    res.json(await translate(`Jake rushed to catch the last train, but just as he reached the platform, the doors slid shut. He sighed in frustration, only to hear a soft voice behind him say, "Looks like we’re both stuck here." Turning around, he met the warm smile of a stranger, and suddenly, missing the train didn’t seem so bad.`, "english", "czech"))
+});
+
+app.listen(5001, () => {
+    console.log('Server is running');
+});

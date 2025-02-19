@@ -1,3 +1,5 @@
+version: "3.8"
+name: TRate
 services:
   reverse-proxy:
     image: nginx:latest
@@ -9,57 +11,84 @@ services:
     depends_on:
       - app
       - auth
-    networks:
-      - reverse-proxy-network
-  
-  
+      - process-translation
   auth:
     build: ./containers/auth
     container_name: auth
     env_file: .env
     ports:
-      - "1000:${AUTH_SERVER_PORT}"
-    networks:
-      - reverse-proxy-network
+      - "3000:3000"
     depends_on:
-      auth-postgresdb:
-        condition: service_healthy
+      - auth-postgresdb
   
   auth-postgresdb:
     build: ./containers/auth-postgresdb
     container_name: auth-postgresdb
     ports:
-      - ${AUTH_POSTGRESDB_PORT}:${AUTH_POSTGRESDB_PORT}
+      - 5432:5432
     volumes:
       - auth-postgresdb-volume:/var/lib/postgresql/data
-    command: "-p ${AUTH_POSTGRESDB_PORT}"
-    networks:
-      - reverse-proxy-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 5
     environment:
-    - POSTGRES_USER=${AUTH_POSTGRESDB_USER}
-    - POSTGRES_PASSWORD=${AUTH_POSTGRESDB_PASSWORD}
-    - POSTGRES_DB=${AUTH_POSTGRESDB_DB}
+      - POSTGRES_USER=${AUTH_POSTGRESDB_USER}
+      - POSTGRES_PASSWORD=${AUTH_POSTGRESDB_PASSWORD}
+      - POSTGRES_DB=${AUTH_POSTGRESDB_DB}
   
   
   app:
     build: ./containers/app
     container_name: app
     ports:
-      - "5000:3001"
-    networks:
-      - reverse-proxy-network
+      - "5000:5000"
 
 
+  open-ai-translation:
+    build: ./containers/open-ai-translation
+    container_name: open-ai-translation
+    ports:
+      - "5001:5001"
+    env_file: .env
+    depends_on:
+      - rabbitmq
 
-networks:
-  reverse-proxy-network:
-    name: reverse-proxy-network
+  process-translation:
+    build: ./containers/process-translation
+    container_name: process-translation
+    ports:
+      - "5002:5002"
+    env_file: .env
+    environment:
+      AMQP_URL: amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data-volume:/var/lib/rabbitmq/
+      - rabbitmq-log-volume:/var/log/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
 
 
 volumes:
   auth-postgresdb-volume:
     name: auth-postgresdb-volume
+  rabbitmq-data-volume:
+    name: rabbitmq-data-volume
+  rabbitmq-log-volume:
+    name: rabbitmq-log-volume

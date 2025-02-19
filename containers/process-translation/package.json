@@ -1,5 +1,5 @@
 {
-  "name": "open-ai-translation",
+  "name": "process-translation",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -11,8 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "openai": "^4.85.1"
+    "amqplib": "^0.10.5",
+    "express": "^4.21.2"
   }
 }
