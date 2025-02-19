@@ -7,17 +7,13 @@ const { sha256 } = require('js-sha256');
 app.use(express.json());
 
 const pool = new pg.Pool({
-    host: process.env.AUTH_POSTGRESDB_DB,
-    port: 5432,
-    user: process.env.AUTH_POSTGRESDB_USER,
-    password: process.env.AUTH_POSTGRESDB_PASSWORD,
-    database: process.env.AUTH_POSTGRESDB_DB,
+    connectionString: process.env.DATABASE_URL,
 });
 
 
-app.get('/sth', async (req, res) => {
-    res.json("sth");
 
+app.get('/healthcheck', async (req, res) => {
+    res.json("Auth is working");
 });
 
 

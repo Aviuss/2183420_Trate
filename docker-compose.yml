@@ -1,4 +1,3 @@
-version: "3.8"
 name: TRate
 services:
   reverse-proxy:
@@ -12,45 +11,51 @@ services:
       - app
       - auth
       - process-translation
+
   auth:
     build: ./containers/auth
     container_name: auth
-    env_file: .env
     ports:
       - "3000:3000"
     depends_on:
-      - auth-postgresdb
+      - postgresdb
+    healthcheck:
+      test: "curl -f http://localhost:3000/healthcheck"
+      interval: 20s
+      timeout: 45s
+      retries: 2
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
   
-  auth-postgresdb:
-    build: ./containers/auth-postgresdb
-    container_name: auth-postgresdb
+  postgresdb:
+    build: ./containers/postgresdb
+    container_name: postgresdb
     ports:
       - 5432:5432
     volumes:
-      - auth-postgresdb-volume:/var/lib/postgresql/data
+      - postgresdb-volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 5
     environment:
-      - POSTGRES_USER=${AUTH_POSTGRESDB_USER}
-      - POSTGRES_PASSWORD=${AUTH_POSTGRESDB_PASSWORD}
-      - POSTGRES_DB=${AUTH_POSTGRESDB_DB}
-  
-  
+      - POSTGRES_USER=${POSTGRESDB_USER}
+      - POSTGRES_PASSWORD=${POSTGRESDB_PASSWORD}
+      - POSTGRES_DB=postgresdb
+    
   app:
     build: ./containers/app
     container_name: app
     ports:
       - "5000:5000"
 
-
   open-ai-translation:
     build: ./containers/open-ai-translation
     container_name: open-ai-translation
     ports:
       - "5001:5001"
-    env_file: .env
+    environment:
+      - OPEN_AI_API_KEY=${OPEN_AI_API_KEY}
     depends_on:
       - rabbitmq
 
@@ -59,7 +64,6 @@ services:
     container_name: process-translation
     ports:
       - "5002:5002"
-    env_file: .env
     environment:
       AMQP_URL: amqp://rabbitmq:5672
     depends_on:
@@ -86,9 +90,11 @@ services:
 
 
 volumes:
-  auth-postgresdb-volume:
-    name: auth-postgresdb-volume
+  postgresdb-volume:
+    name: postgresdb-volume
   rabbitmq-data-volume:
     name: rabbitmq-data-volume
   rabbitmq-log-volume:
     name: rabbitmq-log-volume
+  autoheal-volume:
+    name: autoheal-volume
