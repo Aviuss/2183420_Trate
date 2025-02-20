@@ -29,6 +29,25 @@ services:
     restart: always
     environment:
       - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
+      - AUTH_URL=http://auth:3000
+  
+  personal:
+    build: ./containers/personal
+    container_name: personal
+    ports:
+      - "5011:5011"
+    depends_on:
+      - postgresdb
+    healthcheck:
+      test: "curl -f http://localhost:3000/healthcheck"
+      interval: 20s
+      timeout: 45s
+      retries: 2
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
+      - AUTH_URL=http://auth:3000
+      - GRADE_SECTION_URL=http://grade_section:5010
   
 
   auth:

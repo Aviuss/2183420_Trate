@@ -102,13 +102,125 @@ app.post('/', async (req, res) => {
     }
 });
 
+async function fetchDataPOST(url, req) {
+    try {
+        let response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req)
+        });
+        let data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return { "error": error }
+    }
+}
+
+
+app.post('/mine', async (req, res) => {
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent email or password or too short" })
+        return;
+    }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
+    }
+
+    const query = {
+        text: 'SELECT * FROM translations'
+    };
+
+    const client = await pool.connect();
+    try {
+        let { rows } = await client.query(query);
+
+        let submitedByUser = rows.filter(el => el.submituid === req.body.uid).map(el => el.id);
+        rows = rows.filter(el => submitedByUser.includes(el.id))
+        if (rows.length > 0) {
+            let group_tasks = [];
+            rows.forEach(el => {
+                let _find = group_tasks.findIndex(e => e.id === el.id);
+                if (_find === -1) {
+                    group_tasks.push({
+                        "id": el.id,
+                        "original_text": el.original_text,
+                        "original_lang": el.original_lang,
+                        "translated_lang": el.translated_lang,
+                        "translations": [
+                            {
+                                "who_translated": el.who_translated,
+                                "translated_text": el.translated_text,
+                            }
+                        ]
+                    })
+                } else {
+                    group_tasks[_find].translations.push({
+                        "who_translated": el.who_translated,
+                        "translated_text": el.translated_text,
+                    })
+                }
+            })
+            group_tasks = group_tasks.filter(el => el.translations.length >= 2);
+            if (group_tasks.length > 0) {
+
+                let group_task_expanded = [];
+                group_tasks = group_tasks.map(el => {
+                    let human_translated_idx = el.translations.findIndex(e => !ai_list.includes(e.who_translated));
+                    for (let i = 0; i < el.translations.length; i++) {
+                        if (ai_list.includes(el.translations[i].who_translated)) {
+                            let new_el = JSON.parse(JSON.stringify(el));
+                            new_el.id = el.id + "_" + el.translations[human_translated_idx].who_translated + "_" + el.translations[i].who_translated
+                            new_el.human_translated = el.translations[human_translated_idx];
+                            new_el.ai_translated = el.translations[i];
+                            new_el.translations = undefined;
+                            group_task_expanded.push(new_el)
+                        }
+                    }
+                    return el
+                })
+
+
+
+                res.json({ grade: shuffle(group_task_expanded) })
+            } else {
+                res.json({ grade: [] })
+            }
+
+        } else {
+            res.json({ grade: [] })
+        }
+
+
+    } catch (err) {
+        console.log(err);
+        res.json({ error: err });
+    } finally {
+        client.release();
+    }
+});
 
 app.post('/grade/:id/human/like', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
-    if (!data?.uid) {
-        res.json({ "error": "empty uid" })
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent email or password or too short" })
+        return;
     }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
+    }
+
 
     /*
     CREATE TABLE IF NOT EXISTS translations_grade (
@@ -169,8 +281,16 @@ app.post('/grade/:id/human/like', async (req, res) => {
 app.post('/grade/:id/ai/like', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
-    if (!data?.uid) {
-        res.json({ "error": "empty uid" })
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent email or password or too short" })
+        return;
+    }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
     }
 
     /*
@@ -264,9 +384,18 @@ app.get('/grade/:id/likesamount', async (req, res) => {
 app.post('/grade/:id/human/unlike', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
-    if (!data?.uid) {
-        res.json({ "error": "empty uid" })
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent email or password or too short" })
+        return;
     }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
+    }
+
 
     /*
     CREATE TABLE IF NOT EXISTS translations_grade (
@@ -327,8 +456,16 @@ app.post('/grade/:id/human/unlike', async (req, res) => {
 app.post('/grade/:id/ai/unlike', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
-    if (!data?.uid) {
-        res.json({ "error": "empty uid" })
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent email or password or too short" })
+        return;
+    }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
     }
 
     /*

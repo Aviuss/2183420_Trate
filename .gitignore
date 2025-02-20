@@ -1,4 +1,3 @@
 node_modules
-test.http
-test2.http
+test*.http
 .env

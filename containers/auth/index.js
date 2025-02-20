@@ -153,6 +153,7 @@ app.post("/uid/valid", async (req, res) => {
         res.status(400).json("Error: absent values")
         return;
     }
+    console.log(req.body, req.body.uid)
 
     const query = {
         text: 'SELECT * FROM authorization_tokens WHERE uid=$1 AND authorization_token=$2',
