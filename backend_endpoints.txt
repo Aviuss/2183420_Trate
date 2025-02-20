@@ -1,0 +1,186 @@
+MAIN_URL = https://dcvsetdr5bygvesetvbgdewaxqcaefgt.uk/
+
+
+GET /auth/healthcheck
+    response
+        "Auth is working"
+    used for checking health of auth service
+
+
+POST /auth/register
+    request
+        {
+            "email": "email@mail.com",
+            "password": "password123"
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+    uid and authorization_token should be saved as it is used for authentication
+
+
+POST /auth/login
+    request
+        {
+            "email": "email@mail.com",
+            "password": "password123"
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+            "valid_credentials": true
+        }
+    uid and authorization_token should be saved as it is used for authentication
+    "valid_credentials" means if the login was successfull, if not other fields are empty
+
+
+POST /uid/valid
+    request
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+    response 1
+        {
+            "error: "sth went wrong"
+        }
+    response 2
+        {
+            "valid": true
+        }
+
+
+GET /grade_section/healthcheck
+    response
+        "Grade section is working"
+    used for checking health of grade_section service
+
+
+POST /grade_section
+    used for getting list of element's to compare to between machine and human
+    request
+        {
+            "uid": 1234
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            grade: Array<element>
+        }
+    element
+        {
+            "id": "sgtey54tg",
+            "original_text": "ciao",
+            "original_lang": "italian",
+            "translated_lang": "english",
+            "human_translated": "hay",
+            "ai_translated": "HeY"
+        }
+
+
+POST /grade_section/mine
+    get's list of user's translated entries
+    looks almost exactly the same to /grade_section but
+    request
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+
+POST /grade_section/grade/:id/human/like
+    id is an id of element from /grade_section or /grade_section/mine
+    this endpoint likes human translated sentence for given id
+    request
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            message: "added"
+        }
+
+POST /grade_section/grade/:id/ai/like
+    id is an id of element from /grade_section or /grade_section/mine
+    this endpoint likes ai translated sentence for given id
+    request
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            message: "added"
+        }
+
+POST /grade_section/grade/:id/human/unlike
+    id is an id of element from /grade_section or /grade_section/mine
+    this endpoint unlikes human translated sentence for given id, so it deletes a like
+    request
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            message: "deleted"
+        }
+
+POST /grade_section/grade/:id/ai/unlike
+    id is an id of element from /grade_section or /grade_section/mine
+    this endpoint unlikes ai translated sentence for given id, so it deletes a like
+    request
+        {
+            "uid": 1234,
+            "authorization_token": scfegtj8ya3wef3woqadwf
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            message: "deleted"
+        }
+
+
+POST /grade_section/grade/:id/likesamount
+    id is an id of element from /grade_section or /grade_section/mine
+    it returns number of likes for human and ai answer
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            human_likes: 14,
+            ai_likes: 3
+        }
+
+

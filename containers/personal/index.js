@@ -192,6 +192,39 @@ app.post('/gradeinfo', async (req, res) => {
     }
 });
 
+app.post('/delete/me', async (req, res) => {
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent email or password or too short" })
+        return;
+    }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
+    }
+
+    const query1 = {
+        text: 'DELETE FROM authorization_tokens WHERE uid=$1',
+        values: [req.body.uid]
+    };
+    const query2 = {
+        text: 'DELETE FROM user_credentials WHERE uid=$1',
+        values: [req.body.uid]
+    };
+
+    try {
+        await client.query(query1);
+        await client.query(query2);
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ error: err });
+    } finally {
+        client.release();
+    }
+});
+
 app.listen(5011, () => {
     console.log('Server is running');
 });

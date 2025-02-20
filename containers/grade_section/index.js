@@ -17,14 +17,14 @@ const pool = new pg.Pool({
 
 
 app.get('/healthcheck', async (req, res) => {
-    res.json("Auth is working");
+    res.json("Grade section is working");
 });
 
 let ai_list = ['llama3.2:1b', 'gpt-4o'];
 
 app.post('/', async (req, res) => {
     if (!req.body?.uid) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid" })
         return;
     }
 
@@ -122,7 +122,7 @@ async function fetchDataPOST(url, req) {
 
 app.post('/mine', async (req, res) => {
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 
@@ -437,7 +437,7 @@ app.post('/grade/:id/human/unlike', async (req, res) => {
             }
             try {
                 await client.query(query);
-                res.json({ message: "added" })
+                res.json({ message: "deleted" })
             } catch (err) {
                 res.json({ error: err })
             }
@@ -508,7 +508,7 @@ app.post('/grade/:id/ai/unlike', async (req, res) => {
             }
             try {
                 await client.query(query);
-                res.json({ message: "added" })
+                res.json({ message: "deleted" })
             } catch (err) {
                 res.json({ error: err })
             }

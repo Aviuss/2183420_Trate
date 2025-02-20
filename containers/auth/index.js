@@ -41,15 +41,15 @@ app.post('/register', async (req, res) => {
     let salt = randomstring.generate(100);
     let hash = sha256(req.body.password + salt);
 
+    const uid = randomstring.generate(100);
     const query = {
-        text: 'INSERT INTO user_credentials(email, hash_password, salt) VALUES($1, $2, $3) RETURNING *',
-        values: [req.body.email, hash, salt],
+        text: 'INSERT INTO user_credentials(email, hash_password, salt, uid) VALUES($1, $2, $3, $4)',
+        values: [req.body.email, hash, salt, uid],
     };
 
     const client = await pool.connect();
     try {
-        let results = await client.query(query);
-        uid = results.rows[0].uid;
+        await client.query(query);
 
         let authorization_token = randomstring.generate(300);
         try {
