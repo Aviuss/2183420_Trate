@@ -19,12 +19,20 @@ const pool = new pg.Pool({
 
 
 app.get('/healthcheck', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     res.json("Auth is working");
 });
 
 
 
 app.post('/register', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     if ("email" in req.body && "password" in req.body && req.body.email.lenght >= 3 && req.body.email.lenght >= 3) {
         res.status(400).json({ error: "Error: absent email or password or too short" })
         return;
@@ -70,6 +78,10 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     if ("email" in req.body && "password" in req.body && req.body.email.lenght >= 3 && req.body.email.lenght >= 3) {
         res.status(400).json({ error: "Error: absent email or password or too short" })
         return;
@@ -133,6 +145,10 @@ app.post('/login', async (req, res) => {
 });
 
 app.post("/uid/valid", async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
     if ("uid" in req.body && "authorization_token" in req.body && req.body.uid.lenght >= 3 && req.body.authorization_token.lenght >= 3) {
         res.status(400).json("Error: absent values")
         return;
