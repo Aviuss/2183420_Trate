@@ -3,7 +3,7 @@ import pg from 'pg';
 import randomstring from 'randomstring';
 import express from 'express';
 const app = express();
-const cors = require('cors');
+import cors from 'cors';
 
 app.use(cors({
     origin: '*',
