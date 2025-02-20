@@ -1,9 +1,6 @@
 const express = require('express');
 const app = express();
 const pg = require('pg');
-var randomstring = require("randomstring");
-const { sha256 } = require('js-sha256');
-const e = require('express');
 const cors = require('cors');
 
 app.use(cors({
@@ -27,7 +24,7 @@ app.get('/healthcheck', async (req, res) => {
 
 app.post('/', async (req, res) => {
     if (!req.body?.uid) {
-        res.status(400).json("Error: absent email or password or too short")
+        res.status(400).json({ error: "Error: absent email or password or too short" })
         return;
     }
 
@@ -83,22 +80,37 @@ app.post('/', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json("error");
+        res.json({ error: err });
     } finally {
         client.release();
     }
 });
 
 
-app.post('/:uid', (req, res) => {
-    const { uid } = req.params;
+app.post('/grade/:id', async (req, res) => {
+    const { id } = req.params;
     const data = req.body;
+    if (data?.who_translated) {
+        console.log("todo")
+    }
 
-    res.json({
-        message: 'Received POST request',
-        uid: uid,
-        receivedData: data,
-    });
+    const query = {
+        text: 'SELECT * FROM translations WHERE id = $1',
+        values: [id],
+    };
+
+    const client = await pool.connect();
+    try {
+        let { rows } = await client.query(query);
+
+
+    } catch (err) {
+        console.log(err);
+        res.json({ error: err });
+    } finally {
+        client.release();
+    }
+
 });
 
 

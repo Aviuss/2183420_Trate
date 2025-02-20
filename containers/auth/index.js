@@ -56,14 +56,14 @@ app.post('/register', async (req, res) => {
             });
         } catch (err) {
             console.log(err);
-            res.json({ error: "error" });
+            res.json({ error: err });
         }
 
 
 
     } catch (err) {
         console.log(err);
-        res.json({ error: "error" });
+        res.json({ error: err });
     } finally {
         client.release();
     }
@@ -117,7 +117,7 @@ app.post('/login', async (req, res) => {
                     });
                 } catch (err) {
                     console.log(err);
-                    res.json({ error: "error" });
+                    res.json({ error: err });
                 }
 
             }
@@ -126,7 +126,7 @@ app.post('/login', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json({ error: "error" });
+        res.json({ error: err });
     } finally {
         client.release();
     }
@@ -160,7 +160,7 @@ app.post("/uid/valid", async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json("error");
+        res.json({ error: err });
     } finally {
         client.release();
     }
