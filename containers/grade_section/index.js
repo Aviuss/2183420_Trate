@@ -210,7 +210,7 @@ app.post('/grade/:id/human/like', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 
@@ -282,7 +282,7 @@ app.post('/grade/:id/ai/like', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 
@@ -385,7 +385,7 @@ app.post('/grade/:id/human/unlike', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 
@@ -457,7 +457,7 @@ app.post('/grade/:id/ai/unlike', async (req, res) => {
     const { id } = req.params;
     const data = req.body;
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 

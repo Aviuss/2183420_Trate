@@ -17,6 +17,10 @@ const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
 });
 
+app.get('/healthcheck', async (req, res) => {
+    res.json("Process translation is working");
+});
+
 function checkRequestBody(body) {
     if (Object.is(body)) { return false }
     let invalid = false;

@@ -17,7 +17,7 @@ const pool = new pg.Pool({
 
 
 app.get('/healthcheck', async (req, res) => {
-    res.json("Auth is working");
+    res.json("Personal is working");
 });
 
 let ai_list = ['llama3.2:1b', 'gpt-4o'];
@@ -54,7 +54,7 @@ async function fetchDataGET(url) {
 
 app.post('/email', async (req, res) => {
     if (!req.body?.uid) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid" })
         return;
     }
 
@@ -79,7 +79,7 @@ app.post('/email', async (req, res) => {
 
 app.post('/gradeinfo', async (req, res) => {
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 
@@ -135,6 +135,7 @@ app.post('/gradeinfo', async (req, res) => {
                 await Promise.all(group_tasks.map(async (el) => {
                     let human_translated_idx = el.translations.findIndex(e => !ai_list.includes(e.who_translated));
                     amount_of_created_translations++;
+                    let ai_better = false;
 
                     for (let i = 0; i < el.translations.length; i++) {
                         if (ai_list.includes(el.translations[i].who_translated)) {
@@ -147,10 +148,11 @@ app.post('/gradeinfo', async (req, res) => {
 
                             let res = await fetchDataGET(process.env.GRADE_SECTION_URL + `/grade/${new_el.id}/likesamount`);
                             total_amount_of_likes += res.human_likes;
-                            if (res.human_likes >= res.ai_likes) {
-                                amount_of_translations_better_than_ai++;
-                            }
+                            ai_better = ai_better || res.human_likes < res.ai_likes
                         }
+                    }
+                    if (ai_better) {
+                        amount_of_translations_better_than_ai++;
                     }
                 }))
 
@@ -194,7 +196,7 @@ app.post('/gradeinfo', async (req, res) => {
 
 app.post('/delete/me', async (req, res) => {
     if (!req.body?.uid || !req.body?.authorization_token) {
-        res.status(400).json({ error: "Error: absent email or password or too short" })
+        res.status(400).json({ error: "Error: absent uid or token" })
         return;
     }
 

@@ -19,8 +19,8 @@ POST /auth/register
         }
     response 2
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
     uid and authorization_token should be saved as it is used for authentication
 
@@ -37,8 +37,8 @@ POST /auth/login
         }
     response 2
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
             "valid_credentials": true
         }
     uid and authorization_token should be saved as it is used for authentication
@@ -48,8 +48,8 @@ POST /auth/login
 POST /uid/valid
     request
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
     response 1
         {
@@ -71,7 +71,7 @@ POST /grade_section
     used for getting list of element's to compare to between machine and human
     request
         {
-            "uid": 1234
+            "uid": "1234"
         }
     response 1
         {
@@ -97,17 +97,18 @@ POST /grade_section/mine
     looks almost exactly the same to /grade_section but
     request
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
+
 
 POST /grade_section/grade/:id/human/like
     id is an id of element from /grade_section or /grade_section/mine
     this endpoint likes human translated sentence for given id
     request
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
     response 1
         {
@@ -117,14 +118,15 @@ POST /grade_section/grade/:id/human/like
         {
             message: "added"
         }
+
 
 POST /grade_section/grade/:id/ai/like
     id is an id of element from /grade_section or /grade_section/mine
     this endpoint likes ai translated sentence for given id
     request
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
     response 1
         {
@@ -135,13 +137,14 @@ POST /grade_section/grade/:id/ai/like
             message: "added"
         }
 
+
 POST /grade_section/grade/:id/human/unlike
     id is an id of element from /grade_section or /grade_section/mine
     this endpoint unlikes human translated sentence for given id, so it deletes a like
     request
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
     response 1
         {
@@ -152,13 +155,14 @@ POST /grade_section/grade/:id/human/unlike
             message: "deleted"
         }
 
+
 POST /grade_section/grade/:id/ai/unlike
     id is an id of element from /grade_section or /grade_section/mine
     this endpoint unlikes ai translated sentence for given id, so it deletes a like
     request
         {
-            "uid": 1234,
-            "authorization_token": scfegtj8ya3wef3woqadwf
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
         }
     response 1
         {
@@ -184,3 +188,80 @@ POST /grade_section/grade/:id/likesamount
         }
 
 
+GET /personal/healthcheck
+    response
+        "Personal is working"
+    used for checking health of personal service
+
+
+POST /personal/email
+    request
+        {
+            "uid": "213awds"
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            "email": "email@mail.com"
+        }
+
+
+POST /personal/gradeinfo
+    request
+        {
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        {
+            "amount_of_created_translations": 123,
+            "amount_of_ai_translations": 512,
+            "amount_of_translations_better_than_ai": 55,
+            "total_amount_of_likes": 99
+        }
+
+
+POST /personal/delete/me
+    request
+        {
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }
+    response 2
+        [no response]
+
+
+GET /processtranslation/healthcheck
+    response
+        "Process translation is working"
+    used for checking health of process translation service
+
+
+POST /processtranslation
+    request
+        {
+            "uid": "asdfgad",
+            "original_text": "ciao";
+            "original_lang": "italian"
+            "translated_text": "hej"
+            "translated_lang": "polish"
+        }
+    response 1
+        {
+            "error": "sth went wrong"
+        }    
+    response 2
+        {
+            "message": "added to queue"
+        }
