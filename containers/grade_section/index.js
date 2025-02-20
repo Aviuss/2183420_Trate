@@ -4,7 +4,13 @@ const pg = require('pg');
 var randomstring = require("randomstring");
 const { sha256 } = require('js-sha256');
 const e = require('express');
+const cors = require('cors');
 
+app.use(cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: '*',
+}));
 app.use(express.json());
 
 const pool = new pg.Pool({

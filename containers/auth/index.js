@@ -6,9 +6,9 @@ const { sha256 } = require('js-sha256');
 const cors = require('cors');
 
 app.use(cors({
-    origin: '*',  // Allow all origins
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',  // Allow all HTTP methods
-    allowedHeaders: '*',  // Allow all headers (use specific ones if needed)
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: '*',
 }));
 
 app.use(express.json());
@@ -16,7 +16,6 @@ app.use(express.json());
 const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
 });
-
 
 
 app.get('/healthcheck', async (req, res) => {
@@ -27,7 +26,7 @@ app.get('/healthcheck', async (req, res) => {
 
 app.post('/register', async (req, res) => {
     if ("email" in req.body && "password" in req.body && req.body.email.lenght >= 3 && req.body.email.lenght >= 3) {
-        res.status(400).json("Error: absent email or password or too short")
+        res.status(400).json({ error: "Error: absent email or password or too short" })
         return;
     }
 
@@ -57,14 +56,14 @@ app.post('/register', async (req, res) => {
             });
         } catch (err) {
             console.log(err);
-            res.json("error");
+            res.json({ error: "error" });
         }
 
 
 
     } catch (err) {
         console.log(err);
-        res.json("error");
+        res.json({ error: "error" });
     } finally {
         client.release();
     }
@@ -72,7 +71,7 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     if ("email" in req.body && "password" in req.body && req.body.email.lenght >= 3 && req.body.email.lenght >= 3) {
-        res.status(400).json("Error: absent email or password or too short")
+        res.status(400).json({ error: "Error: absent email or password or too short" })
         return;
     }
 
@@ -118,7 +117,7 @@ app.post('/login', async (req, res) => {
                     });
                 } catch (err) {
                     console.log(err);
-                    res.json("error");
+                    res.json({ error: "error" });
                 }
 
             }
@@ -127,7 +126,7 @@ app.post('/login', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json("error");
+        res.json({ error: "error" });
     } finally {
         client.release();
     }
