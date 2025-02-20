@@ -13,6 +13,24 @@ services:
       - auth
       - process-translation
 
+
+  grade_section:
+    build: ./containers/grade_section
+    container_name: grade_section
+    ports:
+      - "5010:5010"
+    depends_on:
+      - postgresdb
+    healthcheck:
+      test: "curl -f http://localhost:3000/healthcheck"
+      interval: 20s
+      timeout: 45s
+      retries: 2
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRESDB_USER}:${POSTGRESDB_PASSWORD}@postgresdb:5432/postgresdb
+  
+
   auth:
     build: ./containers/auth
     container_name: auth
