@@ -71,7 +71,7 @@ app.post('/email', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }
@@ -186,7 +186,7 @@ app.post('/gradeinfo', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }

@@ -96,7 +96,7 @@ app.post('/', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }
@@ -200,7 +200,7 @@ app.post('/mine', async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }
@@ -269,7 +269,7 @@ app.post('/grade/:id/human/like', async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }
@@ -340,7 +340,7 @@ app.post('/grade/:id/ai/like', async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }
@@ -370,7 +370,7 @@ app.get('/grade/:id/likesamount', async (req, res) => {
         res.json({ human_likes: human_likes, ai_likes: ai_likes })
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
         client.release();
         return;
     } finally {
@@ -444,7 +444,7 @@ app.post('/grade/:id/human/unlike', async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }
@@ -515,7 +515,7 @@ app.post('/grade/:id/ai/unlike', async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.json({ error: err });
+        res.status(400).json({ error: err });
     } finally {
         client.release();
     }

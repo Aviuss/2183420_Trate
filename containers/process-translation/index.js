@@ -47,7 +47,7 @@ app.post('/', async (req, res) => {
         await client.query(query);
     } catch (err) {
         console.log(err);
-        res.json("database error");
+        res.status(400).json("database error");
     } finally {
         client.release();
     }
