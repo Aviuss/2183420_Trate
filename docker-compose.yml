@@ -113,7 +113,7 @@ services:
       test: "curl -f http://localhost:15672"
       interval: 10s
       timeout: 10s
-      retries: 3     
+      retries: 20
   
   llama-translation:
     build: ./containers/llama-translation

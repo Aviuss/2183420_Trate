@@ -36,7 +36,7 @@ app.post('/', async (req, res) => {
         return;
     }
 
-    const id = randomstring.generate(500);
+    const id = randomstring.generate(50).replaceAll("_", "-");
     const query = {
         text: 'INSERT INTO translations(id, submituid, original_text, original_lang, translated_text, translated_lang, who_translated) VALUES($1, $2, $3, $4, $5, $6, $7)',
         values: [id, req.body.uid, req.body.original_text, req.body.original_lang, req.body.translated_text, req.body.translated_lang, req.body.uid],
