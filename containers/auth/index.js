@@ -3,6 +3,13 @@ const app = express();
 const pg = require('pg');
 var randomstring = require("randomstring");
 const { sha256 } = require('js-sha256');
+const cors = require('cors');
+
+app.use(cors({
+    origin: '*',  // Allow all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',  // Allow all HTTP methods
+    allowedHeaders: '*',  // Allow all headers (use specific ones if needed)
+}));
 
 app.use(express.json());
 

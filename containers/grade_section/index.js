@@ -3,6 +3,7 @@ const app = express();
 const pg = require('pg');
 var randomstring = require("randomstring");
 const { sha256 } = require('js-sha256');
+const e = require('express');
 
 app.use(express.json());
 
@@ -60,20 +61,15 @@ app.post('/', async (req, res) => {
                     })
                 }
             })
-            group_tasks = group_tasks.filter(el => el.translations.length >= 3)
-            if (group_tasks.length === 0) {
-
-                res.json({ result: false, grade: {} })
-            } else {
-
-                group_tasks = group_tasks.map(el => {
-                    el.translations = shuffle(el.translations);
-                    return [el[0], el[1], el[2]];
-                })
+            group_tasks = group_tasks.map(el => {
+                el.translations = shuffle(el.translations);
+                el.translations = [el.translations[0], el.translations[1], el.translations[2]]
+                return el
+            })
 
 
-                res.json({ result: true, grade: shuffle(group_tasks)[0] })
-            }
+            res.json({ result: true, grade: shuffle(group_tasks)[0] })
+
         } else {
             res.json({ result: false, grade: {} })
         }
@@ -88,7 +84,16 @@ app.post('/', async (req, res) => {
 });
 
 
+app.post('/:uid', (req, res) => {
+    const { uid } = req.params;
+    const data = req.body;
 
+    res.json({
+        message: 'Received POST request',
+        uid: uid,
+        receivedData: data,
+    });
+});
 
 
 app.listen(5010, () => {
