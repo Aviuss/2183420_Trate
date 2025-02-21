@@ -510,7 +510,7 @@ app.post('/grade/:id/ai/unlike', async (req, res) => {
                 await client.query(query);
                 res.json({ message: "deleted" })
             } catch (err) {
-                res.json({ error: err })
+                res.status(400).json({ error: err })
             }
         }
     } catch (err) {
@@ -522,6 +522,50 @@ app.post('/grade/:id/ai/unlike', async (req, res) => {
 
 
 });
+
+app.post('/grade/:id/liked', async (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    if (!req.body?.uid || !req.body?.authorization_token) {
+        res.status(400).json({ error: "Error: absent uid or token" })
+        return;
+    }
+
+
+    let authorization = await fetchDataPOST(process.env.AUTH_URL + "/uid/valid", req.body);
+    if (!authorization.valid) {
+        res.status(403).json({ "error": "wrong token" })
+        return;
+    }
+    let query = {
+        text: 'SELECT * FROM translations_grade WHERE id = $1 AND uid_grading = $2',
+        values: [id, data.uid],
+    };
+
+    const client = await pool.connect();
+    try {
+        let { rows } = await client.query(query);
+        let human_grade = 0;
+        let ai_grade = 0;
+        let waserror = false;
+        if (rows.length != 0) {
+            human_grade = rows[0]?.human_grade || 0;
+            ai_grade = rows[0]?.ai_grade || 0;
+        }
+        res.json({
+            liked_ai: ai_grade > 0,
+            liked_human: human_grade > 0
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ error: err });
+    } finally {
+        client.release();
+    }
+
+
+});
+
 
 app.listen(5010, () => {
     console.log('Server is running');

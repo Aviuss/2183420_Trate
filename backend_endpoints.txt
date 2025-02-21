@@ -188,6 +188,25 @@ POST /grade_section/grade/:id/likesamount
         }
 
 
+POST /grade_section/grade/:id/liked
+    returns booleans if the particular post was liked or not
+    request
+        {
+            "uid": "1234",
+            "authorization_token": "scfegtj8ya3wef3woqadwf"
+        }
+    response 1
+        {
+            "liked_ai": true,
+            "liked_human": false
+        }
+    response 2
+        {
+            "error": "sth went wrong"
+        }
+
+
+
 GET /personal/healthcheck
     response
         "Personal is working"

@@ -206,7 +206,7 @@ app.post('/delete/me', async (req, res) => {
         res.status(403).json({ "error": "wrong token" })
         return;
     }
-
+    const client = await pool.connect();
     const query1 = {
         text: 'DELETE FROM authorization_tokens WHERE uid=$1',
         values: [req.body.uid]
