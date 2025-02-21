@@ -73,8 +73,8 @@ app.post('/', async (req, res) => {
                         if (ai_list.includes(el.translations[i].who_translated)) {
                             let new_el = JSON.parse(JSON.stringify(el));
                             new_el.id = el.id + "_" + el.translations[human_translated_idx].who_translated + "_" + el.translations[i].who_translated
-                            new_el.human_translated = el.translations[human_translated_idx];
-                            new_el.ai_translated = el.translations[i];
+                            new_el.human_translated = el.translations[human_translated_idx].translated_text;
+                            new_el.ai_translated = el.translations[i].translated_text;
                             new_el.translations = undefined;
                             group_task_expanded.push(new_el)
                         }
@@ -177,8 +177,8 @@ app.post('/mine', async (req, res) => {
                         if (ai_list.includes(el.translations[i].who_translated)) {
                             let new_el = JSON.parse(JSON.stringify(el));
                             new_el.id = el.id + "_" + el.translations[human_translated_idx].who_translated + "_" + el.translations[i].who_translated
-                            new_el.human_translated = el.translations[human_translated_idx];
-                            new_el.ai_translated = el.translations[i];
+                            new_el.human_translated = el.translations[human_translated_idx].translated_text;
+                            new_el.ai_translated = el.translations[i].translated_text;
                             new_el.translations = undefined;
                             group_task_expanded.push(new_el)
                         }
