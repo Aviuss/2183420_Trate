@@ -174,7 +174,7 @@ POST /grade_section/grade/:id/ai/unlike
         }
 
 
-POST /grade_section/grade/:id/likesamount
+GET /grade_section/grade/:id/likesamount
     id is an id of element from /grade_section or /grade_section/mine
     it returns number of likes for human and ai answer
     response 1
